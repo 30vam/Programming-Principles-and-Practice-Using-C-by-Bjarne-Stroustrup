@@ -11,14 +11,16 @@
 #include <algorithm>
 #include <cmath>
 using namespace std;
+vector<int> repeats{};
+vector<int> repeatCount{};
 
-void printVec(vector<int> vec) {
+void printVec(vector<int> vec, string text) {
     for (size_t i = 0; i < vec.size(); i++)
     {
         if (vec.size() == 1)
-            cout << "Your Sequence is: { " << vec[i] << " }.\n";
+            cout << text << " { " << vec[i] << " }.\n";
         else if (i == 0)
-            cout << "Your Sequence is: { " << vec[i] << ", ";
+            cout << text << " { " << vec[i] << ", ";
         else if (i == vec.size() - 1)
             cout << vec[i] << " }.\n";
         else
@@ -26,45 +28,74 @@ void printVec(vector<int> vec) {
     }
 }
 
+void getMode(vector<int> vec) {
+    int currentNumCount{ 1 };
 
+    for (int i = 1; i < vec.size(); i++)
+    {
+        if (vec[i] == vec[i - 1]) //add one to counter and add the num to repeats vector if the numbers are repeated
+            currentNumCount++;
+        //if the number repeat ends, add them to the result vectors
+        else {
+            repeats.push_back(vec[i - 1]); // i-1, because the repeat ended at the last number and we want the number that was repeated
+            repeatCount.push_back(currentNumCount);
+            currentNumCount = 1;
+        }
+
+        //if its the last number of the sequence (because it need special treatment):
+        if (i == vec.size() - 1)
+        {
+            repeats.push_back(vec[i]);
+            repeatCount.push_back(currentNumCount);
+        }
+    }
+}
 
 int main()
 {
     vector<int> nums{};
     int a;
+    int maxRepeat{ 1 };
+    int mode{ 0 };
+    int modeCounter = 0;
 
-    cout << "Enter a series of numbers. Enter anything else to end the series: ";
+    cout << "Enter a series of numbers to find the modes (Enter any other character for results): ";
 
     while (cin >> a) //get user input until a string in entered.
         nums.push_back(a);
-
-    int mode{ 0 };
-    int count{ 1 };
-    int currentNumCount{ 1 };
-
+    
     sort(nums.begin(), nums.end());
+    getMode(nums);
 
-    for (int i = 1; i < nums.size(); i++)
+    //find the biggest number in each vector for results
+    for (int i = 0; i < repeatCount.size(); i++)
     {
-        if (nums[i] == nums[i - 1]) //add one to counter if the numbers are repeated
-            currentNumCount++;
-        else if (i != 0)
-            currentNumCount = 1;
+        int idx = repeatCount[i];
 
-        if (currentNumCount > count) {
-            mode = nums[i];
-            count = currentNumCount;
+        if (idx >= maxRepeat)
+        {
+            maxRepeat = idx;
+            mode = repeats[i];
         }
-            
+    }
+    
+    //show the results
+    printVec(nums, "\nUser's Sequence: "); //print the user's number sequence
+    printVec(repeats, "Unique numbers: ");
+    printVec(repeatCount, "Repeatition (in order): ");
+
+    cout << "\nMode(s): ";
+    for (int i = 0; i < repeatCount.size(); i++) //this loop is to check for multiple modes
+    {
+        if (repeatCount[i] == maxRepeat)
+        {
+            cout << repeats[i] << " | ";
+            modeCounter++;
+        }
     }
 
-    printVec(nums); //print the number sequence
-
-    //show the results
-    if (count == 1)
-        cout << "This sequence doesn't have a mode.\n";
-    else
-        cout << "The mode is " << mode << " and it's repeated " << count << " times.\n";
+    cout << "\nNumber of modes found: " << modeCounter << endl;
+    cout << "Repeatition of each mode: " << maxRepeat << endl;
 
     return 0;
 }
