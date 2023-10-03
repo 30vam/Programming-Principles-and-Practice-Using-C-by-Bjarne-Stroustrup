@@ -10,6 +10,13 @@
 // common synonyms such as Mon and monday. Write out the number of rejected values.
 
 #include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <cmath>
+#include <time.h>
+using namespace std;
 
 int main()
 {
